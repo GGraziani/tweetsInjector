@@ -29,9 +29,6 @@ public class Injector {
         HashMap<String,HashMap<String, List<?>>> tweetsInfo = new HashMap<>();
 
 
-
-
-
         graph.locations.forEach( location -> write(
                 "Location",
                 "SET a.name = $name " +

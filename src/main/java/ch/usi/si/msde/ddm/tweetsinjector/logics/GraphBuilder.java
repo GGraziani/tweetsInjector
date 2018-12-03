@@ -9,11 +9,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 
 public class GraphBuilder {
 
@@ -41,9 +38,9 @@ public class GraphBuilder {
         System.out.print("Scanning data and creating entities/relations...");
 
         // For testing !!!!
-        scanSegment(files.get(0));
+//        scanSegment(files.get(0));
 
-//        files.forEach(GraphBuilder::scanSegment);
+        files.forEach(GraphBuilder::scanSegment);
 
         System.out.println("OK\n\nFound:" +
                 "\n\t- Locations: "+graph.locations.size()+
