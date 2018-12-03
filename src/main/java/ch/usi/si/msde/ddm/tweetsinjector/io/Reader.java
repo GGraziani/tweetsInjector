@@ -1,0 +1,26 @@
+package ch.usi.si.msde.ddm.tweetsinjector.io;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class Reader {
+
+    private BufferedReader br;
+
+    public Reader(File file){
+        try {
+            br = new BufferedReader(new FileReader(file));
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public String nextLine() throws IOException{
+        return br.readLine();
+    }
+
+    public void close() throws IOException{
+        br.close();
+    }
+}
