@@ -3,7 +3,6 @@ package ch.usi.si.msde.ddm.tweetsinjector.logics;
 import ch.usi.si.msde.ddm.tweetsinjector.entities.*;
 import ch.usi.si.msde.ddm.tweetsinjector.io.Reader;
 import ch.usi.si.msde.ddm.tweetsinjector.utils.*;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,9 +37,10 @@ public class GraphBuilder {
         System.out.print("Scanning data and creating entities/relations...");
 
         // For testing !!!!
-//        scanSegment(files.get(0));
-
-        files.forEach(GraphBuilder::scanSegment);
+        for(int i=0;i<5;i++){
+            scanSegment(files.get(i));
+        }
+//        files.forEach(GraphBuilder::scanSegment);
 
         System.out.println("OK\n\nFound:" +
                 "\n\t- Locations: "+graph.locations.size()+

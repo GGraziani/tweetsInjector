@@ -3,4 +3,5 @@
     <ds>./src/main/resources/data/dataStore</ds>
     <segments>./src/main/resources/data/dataStore/segments</segments>
     <lists>./src/main/resources/data/lists</lists>
+    <database>NEO4J</database>
 </params>

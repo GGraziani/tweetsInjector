@@ -12,6 +12,21 @@ import java.util.ArrayList;
 public class Utils {
 
 
+    public static void parseArgs(String[] args, Params p){
+        for(String s: args){
+            String[] str = s.split("=");
+
+            switch (str[0].toLowerCase()) {
+                case "-db": case "-database":
+                    DB database = p.matchStr(str[1]);
+                    if(database != null)
+                        p.database = database;
+            }
+        }
+    }
+
+
+
     public static ArrayList<File> sortSegments(ArrayList<File> files) {
         files.sort((file1, file2) -> Integer.parseInt(file1.getName().substring(file1.getName().indexOf('-')+1)) - Integer.parseInt(file2.getName().substring(file2.getName().indexOf('-')+1)));
         return files;

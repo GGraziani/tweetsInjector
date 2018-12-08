@@ -1,2 +1,6 @@
 .idea
-target
+target/*
+
+\.DS_Store
+
+*.class

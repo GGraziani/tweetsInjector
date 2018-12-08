@@ -4,4 +4,17 @@ public class Params {
     public String ds;
     public String segments;
     public String lists;
+    public DB database;
+
+
+    public DB matchStr(String a){
+        try {
+            return DB.valueOf(a);
+        } catch (IllegalArgumentException e){
+            return null;
+        }
+    }
 }
+
+
+

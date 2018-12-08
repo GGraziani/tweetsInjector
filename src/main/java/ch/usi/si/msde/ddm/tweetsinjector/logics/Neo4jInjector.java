@@ -1,24 +1,18 @@
 package ch.usi.si.msde.ddm.tweetsinjector.logics;
 
 import ch.usi.si.msde.ddm.tweetsinjector.entities.Graph;
-import ch.usi.si.msde.ddm.tweetsinjector.entities.HashTag;
 import ch.usi.si.msde.ddm.tweetsinjector.entities.Location;
 import ch.usi.si.msde.ddm.tweetsinjector.utils.ConnectService;
 
 import org.neo4j.driver.v1.*;
-
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.neo4j.driver.v1.Values.ofBoolean;
 import static org.neo4j.driver.v1.Values.parameters;
 
-public class Injector {
+public class Neo4jInjector {
 
     private final Driver driver;
 
-    public Injector(){
+    public Neo4jInjector(){
         driver = ConnectService.getDriver();
     }
 
@@ -26,8 +20,6 @@ public class Injector {
         System.out.print("Injecting graph into Neo4j....");
 
         HashMap<String,ArrayList<String>> usersTweets = new HashMap<>();
-        HashMap<String,HashMap<String, List<?>>> tweetsInfo = new HashMap<>();
-
 
         graph.locations.forEach( location -> write(
                 "Location",
@@ -102,8 +94,6 @@ public class Injector {
                     parameters("uid", uid,"tid", tid)
             ));
         });
-
-        tweetsInfo.keySet().forEach( tid -> System.out.println(tweetsInfo.get(tid)));
 
         System.out.println("OK");
     }
