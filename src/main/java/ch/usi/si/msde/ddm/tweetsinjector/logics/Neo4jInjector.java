@@ -34,7 +34,10 @@ public class Neo4jInjector {
 
 
         graph.users.forEach(usr -> {
+
+            // Saving information about tweets for each user
             usersTweets.put(usr.getId(), usr.getTweetsIds());
+
             write(
                 "User",
                 "SET a.uid = $id " +

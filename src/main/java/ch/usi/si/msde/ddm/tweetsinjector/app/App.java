@@ -21,7 +21,6 @@ public class App {
 
         switch (p.database){
 
-
             case NEO4J:
                 Neo4jInjector neo4jInjector= new Neo4jInjector();
                 neo4jInjector.inject(graph);
@@ -30,10 +29,10 @@ public class App {
                 MongodbInjector mongodbInjector = new MongodbInjector();
                 mongodbInjector.inject(graph);
                 break;
+            case HIVE:
+
+
         }
-
-
-
     }
 }
 
