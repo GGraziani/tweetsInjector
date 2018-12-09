@@ -44,12 +44,6 @@ public class Neo4jInjector {
 
         graph.tweets.forEach( twt -> {
 
-            HashMap<String, List<String>> mentions = new HashMap<>();
-            mentions.put("mentions", twt.getMentions());
-
-            HashMap<String, List<Location>> location = new HashMap<>();
-            location.put("location", Collections.singletonList(twt.getLocation()));
-
             write(
                     "Tweet",
                     "SET a.tid = $id " +
@@ -57,7 +51,7 @@ public class Neo4jInjector {
                             "SET a.created_at = $created_at ",
                     parameters("id", twt.getId(), "text", twt.getText(), "created_at", twt.getCreatedAt()));
 
-            if(twt.getHashTags().size() > 0){
+            if(!twt.getHashTags().isEmpty()){
                 twt.getHashTags().forEach(hts -> connect(
                         "Tweet",
                         "HashTag",
@@ -67,7 +61,7 @@ public class Neo4jInjector {
                 ));
             }
 
-            if(twt.getMentions().size() > 0) {
+            if(!twt.getMentions().isEmpty()) {
                 twt.getMentions().forEach(mention -> connect(
                         "Tweet",
                         "User",
@@ -85,15 +79,15 @@ public class Neo4jInjector {
                     parameters("tid", twt.getId(),"name", twt.getLocation().getName()));
         });
 
-        usersTweets.keySet().forEach( uid -> {
-            usersTweets.get(uid).forEach(tid ->  connect(
+        usersTweets.keySet().forEach( uid ->
+                usersTweets.get(uid).forEach(tid ->  connect(
                     "User",
                     "Tweet",
                     "where a.uid=$uid and b.tid=$tid ",
                     "tweets",
                     parameters("uid", uid,"tid", tid)
-            ));
-        });
+            ))
+        );
 
         System.out.println("OK");
     }
@@ -127,16 +121,13 @@ public class Neo4jInjector {
                 @Override
                 public String execute(Transaction tx )
                 {
-                    StatementResult result = tx.run(
+                    tx.run(
                             "Match (a:"+entity1+"), (b:"+entity2+") "+
                                     properties+
                                     "create (a)-[:"+relation+"]->(b)"+
                                     "return a",
                             parameters);
-//                    System.out.println(result.list());
-//                    if(result.list().size() > 0){
-//                        return  result.list().get(0).toString();
-//                    }
+
                     return null;
                 }
             });

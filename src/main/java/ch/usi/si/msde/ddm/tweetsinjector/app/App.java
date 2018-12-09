@@ -25,10 +25,11 @@ public class App {
             case NEO4J:
                 Neo4jInjector neo4jInjector= new Neo4jInjector();
                 neo4jInjector.inject(graph);
+                break;
             case MONGODB:
                 MongodbInjector mongodbInjector = new MongodbInjector();
                 mongodbInjector.inject(graph);
-
+                break;
         }
 
 

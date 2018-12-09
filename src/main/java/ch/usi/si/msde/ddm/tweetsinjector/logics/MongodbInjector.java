@@ -26,25 +26,55 @@ public class MongodbInjector {
 
         database.dropDatabase();
 
-//        HashMap<String, ArrayList<String>> usersTweets = new HashMap<>();
+        HashMap<String, ArrayList<String>> usersTweets = new HashMap<>();
 
         database.createCollection("locations", null);
         DBCollection locations = database.getCollection("locations");
         graph.locations.forEach(location -> {
-            BasicDBObject loc = new BasicDBObject();
-            loc.put("name", location.getName());
-            loc.put("code", location.getCode());
-            locations.insert(loc);
+            BasicDBObject tLocation = new BasicDBObject();
+            tLocation.put("name", location.getName());
+            tLocation.put("code", location.getCode());
+            locations.insert(tLocation);
         });
 
         database.createCollection("hashtags", null);
         DBCollection hashtags = database.getCollection("hashtags");
         graph.hashTags.forEach(hashTag -> {
-            BasicDBObject ht = new BasicDBObject();
-            ht.put("text", hashTag.getText());
-            hashtags.insert(ht);
+            BasicDBObject tHashTag = new BasicDBObject();
+            tHashTag.put("text", hashTag.getText());
+            hashtags.insert(tHashTag);
         });
 
+        database.createCollection("users", null);
+        DBCollection users = database.getCollection(("users"));
+        graph.users.forEach(usr -> {
+            usersTweets.put(usr.getId(), usr.getTweetsIds());
+            BasicDBObject tUser = new BasicDBObject();
+            tUser.put("uid", usr.getId());
+            tUser.put("name", usr.getName());
+            users.insert(tUser);
+        });
+
+        database.createCollection("tweets", null);
+        DBCollection tweets = database.getCollection("tweets");
+        graph.tweets.forEach(tweet -> {
+            BasicDBObject tTweet = new BasicDBObject();
+            tTweet.put("tid", tweet.getId());
+            tTweet.put("text", tweet.getText());
+            tTweet.put("created_at", tweet.getCreatedAt());
+            tweets.insert(tTweet);
+
+
+
+
+
+
+
+
+
+
+
+        });
 
     }
 
