@@ -1,14 +1,15 @@
 package ch.usi.si.msde.ddm.tweetsinjector.entities;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Tweet {
 
     private String id;
     private String author_id;
     private String text;
-    private ArrayList<HashTag> hashTags;
-    private ArrayList<String> mentions;
+    private List<HashTag> hashTags;
+    private List<String> mentions;
     private Location location;
     private String createdAt;
 
@@ -35,12 +36,16 @@ public class Tweet {
     }
 
 
-    public ArrayList<HashTag> getHashTags() {
+    public List<HashTag> getHashTags() {
         return hashTags;
     }
 
-    public ArrayList<String> getMentions() {
+    public List<String> getMentions() {
         return mentions;
+    }
+
+    public void setMentions(List<String> mentions) {
+        this.mentions = mentions;
     }
 
     public Location getLocation() {

@@ -46,7 +46,7 @@ public class GraphBuilder {
         if(p.test) {
             // For testing purposes
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
                 scanSegment(files.get(i));
         }
         else {
@@ -77,6 +77,8 @@ public class GraphBuilder {
                     }
                 }
             }
+            filterMentions(graph);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -91,6 +93,7 @@ public class GraphBuilder {
         Location location = getLocation(tweetObj);
         User user = getUser(tweetObj);
         Tweet tweet = getTweet(tweetObj, user.getId(), hashTags, location, isExtended);
+
 
 //        add from here
 
@@ -167,5 +170,18 @@ public class GraphBuilder {
 
     private static void addTweet(Tweet tweet){
         Utils.addTweet(tweet, graph);
+    }
+
+    private static void filterMentions(Graph graph){
+        graph.getTweets().forEach(tweet -> {
+            List<String> realMentions = new ArrayList<>();
+            tweet.getMentions().forEach(mention -> {
+                if(graph.getUsersId().contains(mention)){
+                    realMentions.add(mention);
+                }
+            });
+            tweet.setMentions(realMentions);
+        });
+
     }
 }
