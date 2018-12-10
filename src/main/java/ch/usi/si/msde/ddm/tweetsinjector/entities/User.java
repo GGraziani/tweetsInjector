@@ -8,12 +8,18 @@ public class User {
 
     private String id;
     private String name;
+    private int friendsCount;
+    private int favouritesCount;
     private ArrayList<String> tweetsIds;
+    private String lang;
 
-    public User(String id, String name, String tweetId) {
+    public User(String id, String name, String tweetId, String lang, int friendsCount, int favouritesCount) {
         this.id = id;
         this.name = name;
         this.tweetsIds = new ArrayList<>(Collections.singletonList(tweetId));
+        this.lang = lang;
+        this.friendsCount = friendsCount;
+        this.favouritesCount = favouritesCount;
     }
 
     public String getId() {
@@ -24,16 +30,23 @@ public class User {
         return name;
     }
 
+    public int getFriendsCount(){
+        return friendsCount;
+    }
+
+    public int getFavouritesCount() {
+        return favouritesCount;
+    }
+
+    public String getLang(){
+        return lang;
+    }
+
     public List<String> getTweetsIds() {
         return tweetsIds;
     }
 
-    public void addTweet(String tweet) {
-        tweetsIds.add(tweet);
-    }
-
-    @Override
-    public String toString() {
-        return tweetsIds.toString();
+    public void addAllTweets(List<String> tweets) {
+        tweetsIds.addAll(tweets);
     }
 }

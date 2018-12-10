@@ -3,16 +3,18 @@ package ch.usi.si.msde.ddm.tweetsinjector.app;
 import ch.usi.si.msde.ddm.tweetsinjector.entities.Graph;
 import ch.usi.si.msde.ddm.tweetsinjector.io.XMLReader;
 import ch.usi.si.msde.ddm.tweetsinjector.logics.GraphBuilder;
+import ch.usi.si.msde.ddm.tweetsinjector.logics.HiveInjector;
 import ch.usi.si.msde.ddm.tweetsinjector.logics.MongodbInjector;
 import ch.usi.si.msde.ddm.tweetsinjector.logics.Neo4jInjector;
 import ch.usi.si.msde.ddm.tweetsinjector.utils.Params;
 import ch.usi.si.msde.ddm.tweetsinjector.utils.Utils;
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class App {
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         Params p = XMLReader.readParamsFromXMLFile("./src/main/resources/params/defaults.xml");
         Utils.parseArgs(args, p);
 
@@ -30,6 +32,9 @@ public class App {
                 mongodbInjector.inject(graph);
                 break;
             case HIVE:
+//                Skipped: integration wasn't working
+//                HiveInjector hiveInjector = new HiveInjector();
+//                hiveInjector.inject(graph);
 
 
         }

@@ -15,7 +15,7 @@ public class Reader {
         try {
             br = new BufferedReader(new FileReader(file));
         } catch (IOException e){
-            Utils.LOGGER.log( Level.SEVERE, "Caught the following exception:",e);
+            e.printStackTrace();
         }
     }
 

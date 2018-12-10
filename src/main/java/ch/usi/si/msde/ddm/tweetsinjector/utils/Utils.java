@@ -1,7 +1,6 @@
 package ch.usi.si.msde.ddm.tweetsinjector.utils;
 
 import ch.usi.si.msde.ddm.tweetsinjector.entities.*;
-import org.apache.derby.iapi.reference.ClassName;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -17,8 +16,6 @@ public class Utils {
     private Utils(){
         // Nothing to initialize
     }
-
-    public static final Logger LOGGER = Logger.getLogger(ClassName.class.getName());
 
     public static void parseArgs(String[] args, Params p){
         for(String s: args){
@@ -138,7 +135,7 @@ public class Utils {
     private static void updateUserTweets(List<User> users, User user){
         for(User usr : users){
             if(usr.getId().equals(user.getId())){
-                usr.addTweet(user.getTweetsIds().get(0));
+                usr.addAllTweets(user.getTweetsIds());
                 return;
             }
         }

@@ -31,6 +31,9 @@ public class MongodbInjector {
 
             tUser.put("uid", usr.getId());
             tUser.put("name", usr.getName());
+            tUser.put("lang", usr.getLang());
+            tUser.put("friends_count", usr.getFriendsCount());
+            tUser.put("favourites_count", usr.getFavouritesCount());
 
             users.insert(tUser);
         });

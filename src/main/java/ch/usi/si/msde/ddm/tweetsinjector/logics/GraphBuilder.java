@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -25,13 +24,11 @@ public class GraphBuilder {
     public GraphBuilder(Params p) throws IOException{
         this.p =p;
         File data = new File(p.segments);
-        System.out.println(p.test);
         File[] content = data.listFiles();
         if (content != null) {
             files = Utils.sortSegments(new ArrayList<>(Arrays.asList(content)));
             badWords = Utils.readFileToArrayList(p.lists+"/badWords");
         }
-
     }
 
     public Graph buildGraph() {
@@ -49,7 +46,7 @@ public class GraphBuilder {
         if(p.test) {
             // For testing purposes
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 10; i++)
                 scanSegment(files.get(i));
         }
         else {
@@ -81,7 +78,7 @@ public class GraphBuilder {
                 }
             }
         } catch (IOException e) {
-            Utils.LOGGER.log( Level.SEVERE, "Caught the following exception:", e );
+            e.printStackTrace();
         }
     }
 
@@ -135,10 +132,14 @@ public class GraphBuilder {
 
     private static User getUser(JSONObject tweet){
         JSONObject user = tweet.getJSONObject("user");
+
         return new User(
                 user.getString("id_str"),
                 user.getString("name"),
-                tweet.getString("id_str"));
+                tweet.getString("id_str"),
+                user.getString("lang"),
+                user.getInt("friends_count"),
+                user.getInt("favourites_count"));
     }
 
     private static void addUser(User user){
