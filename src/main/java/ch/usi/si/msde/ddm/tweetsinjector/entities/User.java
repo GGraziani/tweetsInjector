@@ -2,8 +2,9 @@ package ch.usi.si.msde.ddm.tweetsinjector.entities;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
-public class User implements Comparable<User> {
+public class User {
 
     private String id;
     private String name;
@@ -23,18 +24,12 @@ public class User implements Comparable<User> {
         return name;
     }
 
-    public ArrayList<String> getTweetsIds() {
+    public List<String> getTweetsIds() {
         return tweetsIds;
     }
 
     public void addTweet(String tweet) {
-        // Todo duplicate
         tweetsIds.add(tweet);
-    }
-
-    @Override
-    public int compareTo(User usr) {
-        return id.compareTo(usr.getId());
     }
 
     @Override

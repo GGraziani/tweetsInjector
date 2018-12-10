@@ -4,6 +4,7 @@ import ch.usi.si.msde.ddm.tweetsinjector.entities.Graph;
 import ch.usi.si.msde.ddm.tweetsinjector.entities.Location;
 import ch.usi.si.msde.ddm.tweetsinjector.utils.ConnectService;
 
+import ch.usi.si.msde.ddm.tweetsinjector.utils.Utils;
 import org.neo4j.driver.v1.*;
 import java.util.*;
 import static org.neo4j.driver.v1.Values.parameters;
@@ -19,21 +20,21 @@ public class Neo4jInjector {
     public void inject(Graph graph){
         System.out.print("Injecting graph into Neo4j....");
 
-        HashMap<String,ArrayList<String>> usersTweets = new HashMap<>();
+        HashMap<String, List<String>> usersTweets = new HashMap<>();
 
-        graph.locations.forEach( location -> write(
+        graph.getLocations().forEach( location -> write(
                 "Location",
                 "SET a.name = $name " +
                         "SET a.code = $code ",
                 parameters("name", location.getName(), "code", location.getCode()) ));
 
-        graph.hashTags.forEach((hashTag -> write(
+        graph.getHashTags().forEach((hashTag -> write(
                 "HashTag",
                 "SET a.text = $text ",
                 parameters("text", hashTag.getText()))));
 
 
-        graph.users.forEach(usr -> {
+        graph.getUsers().forEach(usr -> {
 
             // Saving information about tweets for each user
             usersTweets.put(usr.getId(), usr.getTweetsIds());
@@ -92,7 +93,7 @@ public class Neo4jInjector {
             ))
         );
 
-        System.out.println("OK");
+        System.out.print("OK");
     }
 
     private void write(
@@ -101,13 +102,10 @@ public class Neo4jInjector {
             Value parameters){
 
         try ( Session session = driver.session() ) {
-            session.writeTransaction( new TransactionWork<String>() {
-                @Override
-                public String execute( Transaction tx )
-                {
-                    StatementResult result = tx.run( "CREATE (a:"+entity+") " +properties+ "RETURN a.name + ', from node ' + id(a)", parameters );
-                    return result.single().get(0).toString();
-                }
+
+            session.writeTransaction(transaction -> {
+                StatementResult result = transaction.run( "CREATE (a:"+entity+") " +properties+ "RETURN a.name + ', from node ' + id(a)", parameters );
+                return result.single().get(0).toString();
             });
         }
     }
@@ -119,20 +117,9 @@ public class Neo4jInjector {
             String relation,
             Value parameters){
         try ( Session session = driver.session() ) {
-
-            session.writeTransaction( new TransactionWork<String>() {
-                @Override
-                public String execute(Transaction tx )
-                {
-                    tx.run(
-                            "Match (a:"+entity1+"), (b:"+entity2+") "+
-                                    properties+
-                                    "create (a)-[:"+relation+"]->(b)"+
-                                    "return a",
-                            parameters);
-
+            session.writeTransaction(transaction -> {
+                transaction.run("Match (a:"+entity1+"), (b:"+entity2+") "+ properties+ "create (a)-[:"+relation+"]->(b)"+ "return a", parameters);
                     return null;
-                }
             });
         }
     }

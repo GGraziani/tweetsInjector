@@ -13,7 +13,7 @@ public class App {
 
 
     public static void main(String[] args) throws IOException {
-        Params p = XMLReader.readParamsFromXMLFile("./src/main/resources/params/defauls.xml");
+        Params p = XMLReader.readParamsFromXMLFile("./src/main/resources/params/defaults.xml");
         Utils.parseArgs(args, p);
 
         GraphBuilder graphBuilder = new GraphBuilder(p);

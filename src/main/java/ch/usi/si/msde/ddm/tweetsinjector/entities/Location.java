@@ -1,11 +1,11 @@
 package ch.usi.si.msde.ddm.tweetsinjector.entities;
 
-public class Location implements Comparable<Location>{
+public class Location {
 
     private String code;
     private String name;
 
-    public Location(String code, String name){
+    public Location(String code, String name) {
         this.code = code;
         this.name = name;
 
@@ -15,18 +15,19 @@ public class Location implements Comparable<Location>{
         return code;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
     @Override
-    public int compareTo(Location loc) {
-        return name.compareTo(loc.getName());
+    public String toString() {
+        return name + " (" + code + ")";
     }
 
     @Override
-    public String toString() {
-        return name+" ("+code+")";
+    public boolean equals(Object obj) {
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return getName().equals( ( (Location) obj).getName());
     }
 }
-

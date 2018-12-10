@@ -1,9 +1,8 @@
 package ch.usi.si.msde.ddm.tweetsinjector.entities;
 
 import java.util.ArrayList;
-import java.util.Date;
 
-public class Tweet implements Comparable<Tweet>{
+public class Tweet {
 
     private String id;
     private String author_id;
@@ -13,7 +12,7 @@ public class Tweet implements Comparable<Tweet>{
     private Location location;
     private String createdAt;
 
-    public Tweet(String id, String author_id, String text, ArrayList<HashTag> hashTags, ArrayList<String> mentions, Location location, String createdAt){
+    public Tweet(String id, String author_id, String text, ArrayList<HashTag> hashTags, ArrayList<String> mentions, Location location, String createdAt) {
         this.id = id;
         this.author_id = author_id;
         this.text = text;
@@ -48,14 +47,7 @@ public class Tweet implements Comparable<Tweet>{
         return location;
     }
 
-
     public String getCreatedAt() {
         return createdAt;
-    }
-
-
-    @Override
-    public int compareTo(Tweet tweet) {
-        return id.compareTo(tweet.id);
     }
 }

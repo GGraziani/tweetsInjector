@@ -10,7 +10,7 @@ public class ConnectService {
     private static final String PASSWORD = "1234";
 
 
-    public static org.neo4j.driver.v1.Driver getDriver(){
+    public static org.neo4j.driver.v1.Driver getDriver() {
         return   GraphDatabase.driver(URL, AuthTokens.basic(USER, PASSWORD));
     }
 }

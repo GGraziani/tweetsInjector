@@ -1,6 +1,7 @@
 package ch.usi.si.msde.ddm.tweetsinjector.utils;
 
 import ch.usi.si.msde.ddm.tweetsinjector.entities.*;
+import org.apache.derby.iapi.reference.ClassName;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -8,31 +9,47 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 public class Utils {
 
+    private Utils(){
+        // Nothing to initialize
+    }
+
+    public static final Logger LOGGER = Logger.getLogger(ClassName.class.getName());
 
     public static void parseArgs(String[] args, Params p){
         for(String s: args){
-            String[] str = s.split("=");
+
+            String[] str = new String[2];
+            if (s.contains("="))
+                str = s.split("=");
+            else
+                str[0] = s;
 
             switch (str[0].toLowerCase()) {
-                case "-db": case "-database":
+                case "-db":
                     DB database = p.matchStr(str[1]);
                     if(database != null)
                         p.database = database;
+                    break;
+                case "-test":
+                    p.test = true;
+                    break;
+                default:
+                    break;
             }
         }
     }
 
-
-
-    public static ArrayList<File> sortSegments(ArrayList<File> files) {
+    public static List<File> sortSegments(List<File> files) {
         files.sort((file1, file2) -> Integer.parseInt(file1.getName().substring(file1.getName().indexOf('-')+1)) - Integer.parseInt(file2.getName().substring(file2.getName().indexOf('-')+1)));
         return files;
     }
 
-    public static ArrayList<String> readFileToArrayList(String path) throws IOException {
+    public static List<String> readFileToArrayList(String path) throws IOException {
         BufferedReader bufReader = new BufferedReader(new FileReader(path));
         ArrayList<String> lines = new ArrayList<String>();
         String line = bufReader.readLine();
@@ -52,7 +69,7 @@ public class Utils {
     /**
      * Checks whether the tweet text contains some bad words and return true in case
      */
-    public static boolean contains_obscenity(JSONObject tweet, Boolean isExtended, ArrayList<String> badWords){
+    public static boolean containsObscenity(JSONObject tweet, Boolean isExtended, List<String> badWords){
         JSONObject obj = new JSONObject(tweet.toString());
         String text;
         if (isExtended) {
@@ -70,7 +87,7 @@ public class Utils {
         return tweet.has("extended_tweet");
     }
 
-    public static boolean findStringMatch(String text, ArrayList<String> list){
+    private static boolean findStringMatch(String text, List<String> list){
         for (String s: list) {
             if(text.contains(s.toLowerCase())){
                 return true;
@@ -81,11 +98,11 @@ public class Utils {
 
     public static void addHashTag(HashTag hashtag, Graph g){
 
-        if(!containsHashTag(g.hashTags,hashtag))
-            g.hashTags.add(hashtag);
+        if(!containsHashTag(g.getHashTags(),hashtag))
+            g.getHashTags().add(hashtag);
     }
 
-    private static Boolean containsHashTag(ArrayList<HashTag> hashTags, HashTag hashtag){
+    private static Boolean containsHashTag(List<HashTag> hashTags, HashTag hashtag){
         for (HashTag ht : hashTags) {
             if ( ht.getText().equals(hashtag.getText()))
                 return true;
@@ -94,31 +111,31 @@ public class Utils {
     }
 
     public static void addLocation(Location location, Graph g){
-        if(!locationExists(g.locations, location))
-            g.locations.add(location);
+        if(!locationExists(g.getLocations(), location))
+            g.getLocations().add(location);
     }
 
-    private static Boolean locationExists(ArrayList<Location> locations, Location location){
+    private static Boolean locationExists(List<Location> locations, Location location){
         for(Location loc : locations){
-            if (loc.compareTo(location) == 0) return true;
+            if (loc.equals(location)) return true;
         }
         return false;
     }
 
     public static void addUser(User user, Graph g){
-        if(userExists(g.usersId, user)){
-            updateUserTweets(g.users, user);
+        if(userExists(g.getUsersId(), user)){
+            updateUserTweets(g.getUsers(), user);
         } else {
-            g.usersId.add(user.getId());
-            g.users.add(user);
+            g.getUsersId().add(user.getId());
+            g.getUsers().add(user);
         }
     }
 
-    private static Boolean userExists(ArrayList<String> users, User user){
+    private static Boolean userExists(List<String> users, User user){
         return users.contains(user.getId());
     }
 
-    private static void updateUserTweets(ArrayList<User> users, User user){
+    private static void updateUserTweets(List<User> users, User user){
         for(User usr : users){
             if(usr.getId().equals(user.getId())){
                 usr.addTweet(user.getTweetsIds().get(0));

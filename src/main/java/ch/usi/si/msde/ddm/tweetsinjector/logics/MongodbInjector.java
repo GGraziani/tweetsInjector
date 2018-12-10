@@ -25,7 +25,7 @@ public class MongodbInjector {
 
         database.createCollection("users", null);
         DBCollection users = database.getCollection(("users"));
-        graph.users.forEach(usr -> {
+        graph.getUsers().forEach(usr -> {
 
             BasicDBObject tUser = new BasicDBObject();
 

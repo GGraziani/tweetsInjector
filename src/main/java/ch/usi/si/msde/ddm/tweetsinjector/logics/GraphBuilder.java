@@ -10,22 +10,32 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class GraphBuilder {
 
-    private static Graph graph;
-    private static ArrayList<String> badWords;
-    private static ArrayList<File> files;
+    private static Graph graph = new Graph();
+    private static List<String> badWords;
+    private List<File> files;
+    private Params p;
 
     public GraphBuilder(Params p) throws IOException{
+        this.p =p;
         File data = new File(p.segments);
-        files = Utils.sortSegments(new ArrayList<>(Arrays.asList(data.listFiles())));
-        badWords = Utils.readFileToArrayList(p.lists+"/badWords");
-        graph = new Graph();
+        System.out.println(p.test);
+        File[] content = data.listFiles();
+        if (content != null) {
+            files = Utils.sortSegments(new ArrayList<>(Arrays.asList(content)));
+            badWords = Utils.readFileToArrayList(p.lists+"/badWords");
+        }
+
     }
 
     public Graph buildGraph() {
-        launchScan(files);
+        launchScan(files, p);
         return graph;
     }
 
@@ -33,20 +43,24 @@ public class GraphBuilder {
      * Scans each line of the segment (json file) and discards obscene content
      * it and launches the "create entities and relations" procedure.
      */
-    private static void launchScan(ArrayList<File> files) {
+    private static void launchScan(List<File> files, Params p) {
         System.out.print("Scanning data and creating entities/relations...");
 
-        // For testing !!!!
-        for(int i=0;i<5;i++){
-            scanSegment(files.get(i));
+        if(p.test) {
+            // For testing purposes
+
+            for (int i = 0; i < 2; i++)
+                scanSegment(files.get(i));
         }
-//        files.forEach(GraphBuilder::scanSegment);
+        else {
+            files.forEach(GraphBuilder::scanSegment);
+        }
 
         System.out.println("OK\n\nFound:" +
-                "\n\t- Locations: "+graph.locations.size()+
-                "\n\t- Hashtags: "+graph.hashTags.size()+
-                "\n\t- Users: "+graph.users.size()+
-                "\n\t- Tweets: "+graph.tweets.size()+
+                "\n\t- Locations: "+graph.getLocations().size()+
+                "\n\t- Hashtags: "+graph.getHashTags().size()+
+                "\n\t- Users: "+graph.getUsers().size()+
+                "\n\t- Tweets: "+graph.getTweets().size()+
                 "\n");
     }
 
@@ -61,13 +75,13 @@ public class GraphBuilder {
                 tweet = new JSONObject(rawObj);
                 if (!Utils.isRetweet(tweet)) {
                     isExtended = Utils.isExtendedTweet(tweet);
-                    if(!Utils.contains_obscenity(tweet, isExtended, badWords)){
+                    if(!Utils.containsObscenity(tweet, isExtended, badWords)){
                         createEntities(tweet, isExtended);
                     }
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Utils.LOGGER.log( Level.SEVERE, "Caught the following exception:", e );
         }
     }
 
@@ -94,13 +108,10 @@ public class GraphBuilder {
      */
     private static ArrayList<HashTag> getHashTags(JSONObject tweet, Boolean isExtended) {
 
-        ArrayList<HashTag> hashTags = new ArrayList<>();
-        JSONObject obj = isExtended? new JSONObject(tweet.toString()).getJSONObject("extended_tweet") : new JSONObject(tweet.toString());
+        JSONObject jsObject = isExtended? new JSONObject(tweet.toString()).getJSONObject("extended_tweet") : new JSONObject(tweet.toString());
+        JSONArray jsArray = jsObject.getJSONObject("entities").getJSONArray("hashtags");
 
-        obj.getJSONObject("entities").getJSONArray("hashtags").forEach(
-                ht -> hashTags.add( new HashTag( ( (JSONObject) ht ).getString("text") ) ) );
-
-        return hashTags;
+        return (ArrayList<HashTag>) IntStream.range(0,jsArray.length()).mapToObj(i -> new HashTag(jsArray.getJSONObject(i).getString("text"))).collect(Collectors.toList());
     }
 
     private static void addHashTags(ArrayList<HashTag> hashTags){
@@ -120,7 +131,7 @@ public class GraphBuilder {
     private static void addLocation(Location location){
         if (location != null)
             Utils.addLocation(location, graph);
-    };
+    }
 
     private static User getUser(JSONObject tweet){
         JSONObject user = tweet.getJSONObject("user");
@@ -138,14 +149,11 @@ public class GraphBuilder {
 
         String text = isExtended? tweet.getJSONObject("extended_tweet").getString("full_text") : tweet.getString("text");
 
-        JSONArray user_mentions = isExtended?
+        JSONArray jsArray = isExtended?
                 tweet.getJSONObject("extended_tweet").getJSONObject("entities").getJSONArray("user_mentions") :
                 tweet.getJSONObject("entities").getJSONArray("user_mentions");
 
-        ArrayList<String> mentions = new ArrayList<>();
-        user_mentions.forEach( mention -> mentions.add( ( (JSONObject) mention ).getString("id_str") ) );
-
-
+        ArrayList<String> mentions = (ArrayList<String>) IntStream.range(0,jsArray.length()).mapToObj(i -> jsArray.getJSONObject(i).getString("id_str")).collect(Collectors.toList());
 
         return new Tweet(
                 tweet.getString("id_str"),
@@ -159,5 +167,4 @@ public class GraphBuilder {
     private static void addTweet(Tweet tweet){
         Utils.addTweet(tweet, graph);
     }
-
 }

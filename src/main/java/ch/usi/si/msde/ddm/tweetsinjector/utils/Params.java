@@ -5,7 +5,7 @@ public class Params {
     public String segments;
     public String lists;
     public DB database;
-
+    public Boolean test;
 
     public DB matchStr(String a){
         try {
