@@ -4,5 +4,5 @@
     <segments>./src/main/resources/data/dataStore/segments</segments>
     <lists>./src/main/resources/data/lists</lists>
     <database>NEO4J</database>
-    <test>False</test>
+    <test>false</test>
 </params>

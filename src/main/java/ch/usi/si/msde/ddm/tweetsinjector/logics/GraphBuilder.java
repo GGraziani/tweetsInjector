@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 public class GraphBuilder {
 
     private static Graph graph = new Graph();
-    private static List<String> badWords;
+    private List<String> badWords;
     private List<File> files;
     private Params p;
 
@@ -32,25 +32,20 @@ public class GraphBuilder {
     }
 
     public Graph buildGraph() {
-        launchScan(files, p);
+        launchScan(files, badWords, p);
         return graph;
     }
 
-    /**
-     * Scans each line of the segment (json file) and discards obscene content
-     * it and launches the "create entities and relations" procedure.
-     */
-    private static void launchScan(List<File> files, Params p) {
+    private static void launchScan(List<File> files, List<String> badWords, Params p) {
         System.out.print("Scanning data and creating entities/relations...");
 
         if(p.test) {
             // For testing purposes
-
             for (int i = 0; i < 100; i++)
-                scanSegment(files.get(i));
+                scanSegment(files.get(i), badWords);
         }
         else {
-            files.forEach(GraphBuilder::scanSegment);
+            files.forEach( file -> scanSegment(file, badWords) );
         }
 
         System.out.println("OK\n\nFound:" +
@@ -61,7 +56,11 @@ public class GraphBuilder {
                 "\n");
     }
 
-    private static void scanSegment(File file) {
+    /**
+     * Scans each line of the segment (json file) and discards obscene content
+     * it and launches the "create entities and relations" procedure.
+     */
+    private static void scanSegment(File file, List<String> badWords) {
         Reader reader = new Reader(file);
         String rawObj;
         JSONObject tweet;
@@ -118,6 +117,9 @@ public class GraphBuilder {
         hashTags.forEach(hashTag -> Utils.addHashTag( hashTag, graph));
     }
 
+    /**
+     * Extract the location from the tweet object
+     */
     private static Location getLocation(JSONObject tweet){
 
         if(!tweet.get("place").toString().equals("null")){
@@ -133,6 +135,9 @@ public class GraphBuilder {
             Utils.addLocation(location, graph);
     }
 
+    /**
+     * Extract the relevant user data from the tweet object
+     */
     private static User getUser(JSONObject tweet){
         JSONObject user = tweet.getJSONObject("user");
 
@@ -149,6 +154,9 @@ public class GraphBuilder {
         Utils.addUser(user, graph);
     }
 
+    /**
+     * Extract the relevant tweet data from the tweet object
+     */
     private static Tweet getTweet(JSONObject tweet, String authorId, ArrayList<HashTag> hashTags, Location location, Boolean isExtended) {
 
         String text = isExtended? tweet.getJSONObject("extended_tweet").getString("full_text") : tweet.getString("text");
@@ -172,6 +180,9 @@ public class GraphBuilder {
         Utils.addTweet(tweet, graph);
     }
 
+    /**
+     * Discards user-ids of non existing users from the mentions
+     */
     private static void filterMentions(Graph graph){
         graph.getTweets().forEach(tweet -> {
             List<String> realMentions = new ArrayList<>();
@@ -182,6 +193,5 @@ public class GraphBuilder {
             });
             tweet.setMentions(realMentions);
         });
-
     }
 }

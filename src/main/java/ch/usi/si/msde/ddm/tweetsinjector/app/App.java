@@ -3,9 +3,9 @@ package ch.usi.si.msde.ddm.tweetsinjector.app;
 import ch.usi.si.msde.ddm.tweetsinjector.entities.Graph;
 import ch.usi.si.msde.ddm.tweetsinjector.io.XMLReader;
 import ch.usi.si.msde.ddm.tweetsinjector.logics.GraphBuilder;
-import ch.usi.si.msde.ddm.tweetsinjector.logics.HiveInjector;
 import ch.usi.si.msde.ddm.tweetsinjector.logics.MongodbInjector;
 import ch.usi.si.msde.ddm.tweetsinjector.logics.Neo4jInjector;
+import ch.usi.si.msde.ddm.tweetsinjector.logics.SparkInjector;
 import ch.usi.si.msde.ddm.tweetsinjector.utils.Params;
 import ch.usi.si.msde.ddm.tweetsinjector.utils.Utils;
 import java.io.IOException;
@@ -31,12 +31,10 @@ public class App {
                 MongodbInjector mongodbInjector = new MongodbInjector();
                 mongodbInjector.inject(graph);
                 break;
-            case HIVE:
-//                Skipped: integration wasn't working
-//                HiveInjector hiveInjector = new HiveInjector();
-//                hiveInjector.inject(graph);
-
-
+            case SPARK:
+                SparkInjector sparkInjector = new SparkInjector();
+                System.out.println("ciaoo");
+                sparkInjector.inject(graph);
         }
     }
 }

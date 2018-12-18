@@ -1,7 +1,6 @@
 package ch.usi.si.msde.ddm.tweetsinjector.logics;
 
 import ch.usi.si.msde.ddm.tweetsinjector.entities.Graph;
-import ch.usi.si.msde.ddm.tweetsinjector.utils.ConnectService;
 
 import org.neo4j.driver.v1.*;
 
@@ -14,7 +13,7 @@ public class Neo4jInjector {
     private final Driver driver;
 
     public Neo4jInjector() {
-        driver = ConnectService.getDriver();
+        driver = ConnectService.getNeo4jDriver();
     }
 
     public void inject(Graph graph) {
