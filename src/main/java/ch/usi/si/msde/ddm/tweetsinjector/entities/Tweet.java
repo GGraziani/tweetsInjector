@@ -6,16 +6,16 @@ import java.util.List;
 public class Tweet {
 
     private String id;
-    private String author_id;
+    private String authorId;
     private String text;
-    private List<HashTag> hashTags;
+    private List<String> hashTags;
     private List<String> mentions;
-    private Location location;
+    private String location;
     private String createdAt;
 
-    public Tweet(String id, String author_id, String text, ArrayList<HashTag> hashTags, ArrayList<String> mentions, Location location, String createdAt) {
+    public Tweet(String id, String authorId, String text, List<String> hashTags, List<String> mentions, String location, String createdAt) {
         this.id = id;
-        this.author_id = author_id;
+        this.authorId = authorId;
         this.text = text;
         this.hashTags = new ArrayList<>(hashTags);
         this.mentions = new ArrayList<>(mentions);
@@ -27,8 +27,8 @@ public class Tweet {
         return id;
     }
 
-    public String getAuthor_id() {
-        return author_id;
+    public String getAuthorId() {
+        return authorId;
     }
 
     public String getText() {
@@ -36,7 +36,7 @@ public class Tweet {
     }
 
 
-    public List<HashTag> getHashTags() {
+    public List<String> getHashTags() {
         return hashTags;
     }
 
@@ -48,7 +48,7 @@ public class Tweet {
         this.mentions = mentions;
     }
 
-    public Location getLocation() {
+    public String getLocation() {
         return location;
     }
 

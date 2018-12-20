@@ -1,6 +1,8 @@
 package ch.usi.si.msde.ddm.tweetsinjector.entities;
 
-public class HashTag {
+import java.io.Serializable;
+
+public class HashTag{
 
     private String text;
 

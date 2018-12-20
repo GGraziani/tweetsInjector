@@ -9,12 +9,11 @@ import ch.usi.si.msde.ddm.tweetsinjector.logics.SparkInjector;
 import ch.usi.si.msde.ddm.tweetsinjector.utils.Params;
 import ch.usi.si.msde.ddm.tweetsinjector.utils.Utils;
 import java.io.IOException;
-import java.sql.SQLException;
 
 public class App {
 
 
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) throws IOException {
         Params p = XMLReader.readParamsFromXMLFile("./src/main/resources/params/defaults.xml");
         Utils.parseArgs(args, p);
 
@@ -33,7 +32,6 @@ public class App {
                 break;
             case SPARK:
                 SparkInjector sparkInjector = new SparkInjector();
-                System.out.println("ciaoo");
                 sparkInjector.inject(graph);
         }
     }

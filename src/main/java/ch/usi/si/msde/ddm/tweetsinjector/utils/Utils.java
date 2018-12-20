@@ -1,6 +1,7 @@
 package ch.usi.si.msde.ddm.tweetsinjector.utils;
 
 import ch.usi.si.msde.ddm.tweetsinjector.entities.*;
+import org.apache.spark.sql.Row;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -8,14 +9,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class Utils {
-
-    private Utils(){
-        // Nothing to initialize
-    }
 
     public static void parseArgs(String[] args, Params p){
         for(String s: args){
@@ -84,6 +81,9 @@ public class Utils {
         return tweet.has("extended_tweet");
     }
 
+    /**
+     * Checks whether the list contains a String matching the input String "text"
+     */
     private static boolean findStringMatch(String text, List<String> list){
         for (String s: list) {
             if(text.contains(s.toLowerCase())){
@@ -93,12 +93,18 @@ public class Utils {
         return false;
     }
 
+    /**
+     * Adds the hashtag to the list of hashtags by avoiding duplicates
+     */
     public static void addHashTag(HashTag hashtag, Graph g){
 
         if(!containsHashTag(g.getHashTags(),hashtag))
             g.getHashTags().add(hashtag);
     }
 
+    /**
+     * Checks whether the list of hashtags contains an hashtag matching the given one
+     */
     private static Boolean containsHashTag(List<HashTag> hashTags, HashTag hashtag){
         for (HashTag ht : hashTags) {
             if ( ht.getText().equals(hashtag.getText()))
@@ -107,11 +113,17 @@ public class Utils {
         return false;
     }
 
+    /**
+     * Adds the location to the list of locations by avoiding duplicates
+     */
     public static void addLocation(Location location, Graph g){
         if(!locationExists(g.getLocations(), location))
             g.getLocations().add(location);
     }
 
+    /**
+     * Checks whether the list of locations contains a location matching the given one
+     */
     private static Boolean locationExists(List<Location> locations, Location location){
         for(Location loc : locations){
             if (loc.equals(location)) return true;
@@ -119,6 +131,9 @@ public class Utils {
         return false;
     }
 
+    /**
+     * Adds the user to the list of users by avoiding duplicates
+     */
     public static void addUser(User user, Graph g){
         if(userExists(g.getUsersId(), user)){
             updateUserTweets(g.getUsers(), user);
@@ -128,9 +143,13 @@ public class Utils {
         }
     }
 
+    /**
+     * Checks whether the list of users contains a user matching the given one
+     */
     private static Boolean userExists(List<String> users, User user){
         return users.contains(user.getId());
     }
+
 
     private static void updateUserTweets(List<User> users, User user){
         for(User usr : users){
@@ -144,4 +163,32 @@ public class Utils {
     public static void addTweet(Tweet tweet,Graph g){
         g.tweets.add(tweet);
     }
+
+    public static String separator(){
+        return "\n-------------------------------------------\n";
+    }
+
+    public static String millisToSecAndMillis(long durationInMillis){
+        long millis = durationInMillis % 1000;
+        long second = (durationInMillis / 1000) % 60;
+
+        return String.format("%2d.%d s", second, millis);
+    }
+
+    public static Row[] sort(List<Row> df){
+        Row[] ar = df.toArray(new Row[df.size()]);
+        for (int i = (ar.length - 1); i >= 0; i--)
+        {
+            for (int j = 1; j <= i; j++)
+            {
+                if (ar[j-1].getInt(0) < ar[j].getInt(0))
+                {
+                    Row temp = ar[j-1];
+                    ar[j-1] = ar[j];
+                    ar[j] = temp;
+                } } }
+        return ar;
+    }
+
+
 }

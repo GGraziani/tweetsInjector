@@ -60,7 +60,7 @@ public class Neo4jInjector {
                         "HashTag",
                         "where a.tid=$tid and b.text=$text ",
                         "has_hashtag ",
-                        parameters("tid", twt.getId(), "text", hts.getText())
+                        parameters("tid", twt.getId(), "text", hts)
                 ));
             }
 
@@ -79,7 +79,7 @@ public class Neo4jInjector {
                         "Location",
                         "where a.tid=$tid and b.name=$name ",
                         "is_located",
-                        parameters("tid", twt.getId(), "name", twt.getLocation().getName()));
+                        parameters("tid", twt.getId(), "name", twt.getLocation()));
         });
 
         usersTweets.keySet().forEach(uid ->

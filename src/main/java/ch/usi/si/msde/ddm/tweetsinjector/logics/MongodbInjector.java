@@ -45,13 +45,13 @@ public class MongodbInjector {
             BasicDBObject tTweet = new BasicDBObject();
 
             tTweet.put("tid", tweet.getId());
-            tTweet.put("authorId", tweet.getAuthor_id());
+            tTweet.put("authorId", tweet.getAuthorId());
             tTweet.put("text", tweet.getText());
-            tTweet.put("hashtags", tweet.getHashTags().stream().map(HashTag::getText).collect(Collectors.toList()));
+            tTweet.put("hashtags", tweet.getHashTags());
 
             tTweet.put("mentions", tweet.getMentions());
             if(tweet.getLocation() != null){
-                tTweet.put("location", tweet.getLocation().toString());
+                tTweet.put("location", tweet.getLocation());
             }
             tTweet.put("created_at", tweet.getCreatedAt());
 

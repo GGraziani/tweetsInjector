@@ -37,7 +37,8 @@ public class GraphBuilder {
     }
 
     private static void launchScan(List<File> files, List<String> badWords, Params p) {
-        System.out.print("Scanning data and creating entities/relations...");
+        System.out.print(Utils.separator()+"Scanning and parsing "+
+                (p.test? 100 : files.size())+" segments of data...");
 
         if(p.test) {
             // For testing purposes
@@ -48,12 +49,12 @@ public class GraphBuilder {
             files.forEach( file -> scanSegment(file, badWords) );
         }
 
-        System.out.println("OK\n\nFound:" +
+        System.out.println(" OK"+Utils.separator());
+        System.out.println("Found:" +
                 "\n\t- Locations: "+graph.getLocations().size()+
                 "\n\t- Hashtags: "+graph.getHashTags().size()+
                 "\n\t- Users: "+graph.getUsers().size()+
-                "\n\t- Tweets: "+graph.getTweets().size()+
-                "\n");
+                "\n\t- Tweets: "+graph.getTweets().size());
     }
 
     /**
@@ -92,7 +93,6 @@ public class GraphBuilder {
         Location location = getLocation(tweetObj);
         User user = getUser(tweetObj);
         Tweet tweet = getTweet(tweetObj, user.getId(), hashTags, location, isExtended);
-
 
 //        add from here
 
@@ -157,7 +157,7 @@ public class GraphBuilder {
     /**
      * Extract the relevant tweet data from the tweet object
      */
-    private static Tweet getTweet(JSONObject tweet, String authorId, ArrayList<HashTag> hashTags, Location location, Boolean isExtended) {
+    private static Tweet getTweet(JSONObject tweet, String authorId, List<HashTag> hashTags, Location location, Boolean isExtended) {
 
         String text = isExtended? tweet.getJSONObject("extended_tweet").getString("full_text") : tweet.getString("text");
 
@@ -165,14 +165,15 @@ public class GraphBuilder {
                 tweet.getJSONObject("extended_tweet").getJSONObject("entities").getJSONArray("user_mentions") :
                 tweet.getJSONObject("entities").getJSONArray("user_mentions");
 
-        ArrayList<String> mentions = (ArrayList<String>) IntStream.range(0,jsArray.length()).mapToObj(i -> jsArray.getJSONObject(i).getString("id_str")).collect(Collectors.toList());
+        List<String> mentions = IntStream.range(0,jsArray.length()).mapToObj(i -> jsArray.getJSONObject(i).getString("id_str")).collect(Collectors.toList());
 
+        String loc = location != null? location.toString() : "";
         return new Tweet(
                 tweet.getString("id_str"),
                 authorId, text,
-                hashTags,
+                hashTags.stream().map(HashTag::getText).collect(Collectors.toList()),
                 mentions,
-                location,
+                loc,
                 tweet.getString("created_at"));
     }
 
