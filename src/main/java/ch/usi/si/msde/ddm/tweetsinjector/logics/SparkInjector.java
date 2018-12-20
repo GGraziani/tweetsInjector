@@ -142,16 +142,23 @@ public class SparkInjector {
         List<Row> mentionsList = new ArrayList<>(usersWithMentions.collectAsList());
         Map<String, Integer> mentionsDict = new HashMap<>();
 
-        mentionsList.forEach( row -> row.getList(0).forEach((el -> {
+        mentionsList.forEach( row -> row.getList(0).forEach(el -> {
             if (mentionsDict.containsKey(el)) {
                 mentionsDict.put( (String) el, mentionsDict.get(el)+1);
             } else {
                 mentionsDict.put( (String) el, 1);
             }
-        })));
+        }));
 
         List<Pair> mentions = mentionsDict.keySet().stream().map( k -> new Pair(k, mentionsDict.get(k))).collect(Collectors.toList());
-        Collections.sort(mentions, (a,b) -> (Integer) a.getValue() >= (Integer) b.getValue()? -1 : 1);
+        Collections.sort(mentions, (a,b) -> {
+            if((Integer) a.getValue() > (Integer) b.getValue())
+                return -1;
+            else if((Integer) a.getValue() < (Integer) b.getValue())
+                return 1;
+            else
+                return 0;
+        });
 
         Dataset<Row> mt = entities.get("users").filter("id = "+mentions.get(0).getKey()+
                         " OR id = "+mentions.get(1).getKey()+
@@ -164,8 +171,4 @@ public class SparkInjector {
 
         mt.show();
     }
-
-
-
-
 }
