@@ -175,20 +175,5 @@ public class Utils {
         return String.format("%2d.%d s", second, millis);
     }
 
-    public static Row[] sort(List<Row> df){
-        Row[] ar = df.toArray(new Row[df.size()]);
-        for (int i = (ar.length - 1); i >= 0; i--)
-        {
-            for (int j = 1; j <= i; j++)
-            {
-                if (ar[j-1].getInt(0) < ar[j].getInt(0))
-                {
-                    Row temp = ar[j-1];
-                    ar[j-1] = ar[j];
-                    ar[j] = temp;
-                } } }
-        return ar;
-    }
-
 
 }

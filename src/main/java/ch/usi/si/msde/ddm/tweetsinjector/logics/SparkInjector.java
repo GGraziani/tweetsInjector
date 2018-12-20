@@ -4,20 +4,27 @@ import ch.usi.si.msde.ddm.tweetsinjector.entities.*;
 
 import ch.usi.si.msde.ddm.tweetsinjector.utils.Utils;
 
+import javafx.util.Pair;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkJobInfo;
 import org.apache.spark.SparkStageInfo;
 import org.apache.spark.api.java.JavaFutureAction;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.*;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.types.ArrayType;
 import org.apache.spark.sql.types.StructType;
+import scala.Function1;
+import scala.collection.mutable.WrappedArray;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 public class SparkInjector {
@@ -35,7 +42,7 @@ public class SparkInjector {
 
         Map<String, Dataset<Row>> entities = new HashMap<>();
 
-        entities.put("entities", spark.createDataFrame(graph.getLocations(), Location.class));
+        entities.put("locations", spark.createDataFrame(graph.getLocations(), Location.class));
         entities.put("hashtags", spark.createDataFrame(graph.getHashTags(), HashTag.class));
         entities.put("users", spark.createDataFrame(graph.getUsers(), User.class));
         entities.put("tweets", spark.createDataFrame(graph.getTweets(), Tweet.class));
@@ -90,12 +97,17 @@ public class SparkInjector {
         long stopTime;
 
         System.out.println("3. List of the first 5 users which liked number of tweets from 60000 to 70000");
+
         startTime = System.currentTimeMillis();
+
         Dataset<Row> favUsers = entities.get("users").filter("favouritesCount BETWEEN 60000 AND 70000").select("favouritesCount","name");
-        List<Row> arr = Arrays.asList(Utils.sort(new ArrayList<>(favUsers.collectAsList())));
-        Dataset<Row> fiveUsers = spark.createDataFrame(arr.subList(arr.size()-5,arr.size()), new StructType()
+        List<Row> arr = new ArrayList<>(favUsers.collectAsList());
+        Collections.sort(arr, (a,b) -> a.getInt(0) >= b.getInt(0) ? -1 : 1);
+
+        Dataset<Row> fiveUsers = spark.createDataFrame(arr.subList(0,5), new StructType()
                 .add("favouritesCount", "int")
                 .add("name", "string"));
+
 
         stopTime = System.currentTimeMillis();
         System.out.println("Founded "+fiveUsers.collectAsList().size()+" total results. (Execution time ="+Utils.millisToSecAndMillis(stopTime - startTime)+")");
@@ -123,10 +135,36 @@ public class SparkInjector {
         long stopTime;
 
         System.out.println("5. Top 5 mentioned users");
-        startTime = System.currentTimeMillis();
-        Dataset<Row> favUsers = entities.get("users").filter("favouritesCount BETWEEN 60000 AND 70000").select("favouritesCount","name");
 
+        startTime = System.currentTimeMillis();
+
+        Dataset<Row> usersWithMentions = entities.get("tweets").select("mentions").filter("size(mentions) != 0");
+        List<Row> mentionsList = new ArrayList<>(usersWithMentions.collectAsList());
+        Map<String, Integer> mentionsDict = new HashMap<>();
+
+        mentionsList.forEach( row -> row.getList(0).forEach((el -> {
+            if (mentionsDict.containsKey(el)) {
+                mentionsDict.put( (String) el, mentionsDict.get(el)+1);
+            } else {
+                mentionsDict.put( (String) el, 1);
+            }
+        })));
+
+        List<Pair> mentions = mentionsDict.keySet().stream().map( k -> new Pair(k, mentionsDict.get(k))).collect(Collectors.toList());
+        Collections.sort(mentions, (a,b) -> (Integer) a.getValue() >= (Integer) b.getValue()? -1 : 1);
+
+        Dataset<Row> mt = entities.get("users").filter("id = "+mentions.get(0).getKey()+
+                        " OR id = "+mentions.get(1).getKey()+
+                        " OR id = "+mentions.get(2).getKey()+
+                        " OR id = "+mentions.get(3).getKey()+
+                        " OR id = "+mentions.get(4).getKey());
+
+        stopTime = System.currentTimeMillis();
+        System.out.println("Founded "+mt.collectAsList().size()+" total results. (Execution time ="+Utils.millisToSecAndMillis(stopTime - startTime)+")");
+
+        mt.show();
     }
+
 
 
 
